@@ -61,7 +61,7 @@ app.post('/api/create_link_token', async function (req, res) {
 });
 
 //TODO: COMPLETE THE FOLLOWING ROUTES (exchange_public_token, set_access_token)
-app.post('/api/exchange_public_token', async function ( req, res, next) {
+app.post('/api/exchange_public_token', async function ( req, res) {
     PUBLIC_TOKEN = req.body.public_token;
     try {
       const tokenResponse = await client.itemPublicTokenExchange({
@@ -78,5 +78,17 @@ app.post('/api/exchange_public_token', async function ( req, res, next) {
       });
     } catch (error) {
       res.json({ error: error });
+    }
+});
+
+app.get('/api/accounts', async function (req, res) {
+  try {
+      console.log(ACCESS_TOKEN);
+      const accountsResponse = await client.accountsGet({
+        access_token: ACCESS_TOKEN,
+      });
+      res.json(accountsResponse.data);
+    } catch(error){
+      res.json({ error: error });      
     }
 });
