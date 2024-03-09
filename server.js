@@ -92,3 +92,43 @@ app.get('/api/accounts', async function (req, res) {
       res.json({ error: error });      
     }
 });
+
+
+app.get('/api/transactions', async function (req, res) {
+  try{  
+    // Set cursor to empty to receive all historical updates
+    let cursor = null;
+    // New transaction updates since "cursor"
+    let added = [];
+    let modified = [];
+    // Removed transaction ids
+    let removed = [];
+    let hasMore = true;
+    // Iterate through each page of new transaction updates for item'
+    while (hasMore) {
+      const request = {
+        access_token: ACCESS_TOKEN,
+        cursor: cursor,
+      };
+      const response = await client.transactionsSync(request);
+      const data = response.data
+      console.log(data);
+      //store current page of results
+      added = added.concat(data.added);
+      modified = modified.concat(data.modified);
+      removed = removed.concat(data.removed);
+      hasMore = data.has_more;
+      //update cursor for next page
+      cursor = data.next_cursor;
+    }
+    console.log(added, modified, removed, cursor);
+    res.json({
+      added: added, 
+      modified: modified, 
+      removed: removed, 
+      cursor: cursor 
+    });
+  }catch(error){
+    res.json({ error: error });
+  }
+});
