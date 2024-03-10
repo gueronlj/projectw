@@ -83,7 +83,7 @@ app.post('/api/exchange_public_token', async function ( req, res) {
 
 app.get('/api/accounts', async function (req, res) {
   try {
-      console.log(ACCESS_TOKEN);
+      console.log("token:", ACCESS_TOKEN);
       const accountsResponse = await client.accountsGet({
         access_token: ACCESS_TOKEN,
       });
@@ -93,6 +93,27 @@ app.get('/api/accounts', async function (req, res) {
     }
 });
 
+app.get('/api/liabilities', async function (req, res) {
+  try{
+    const liabilitiesResponse = await client.liabilitiesGet({
+      access_token: ACCESS_TOKEN,
+    });
+    res.json({ error: null, liabilities: liabilitiesResponse.data });
+  } catch(error){
+    res.json({ error: error });
+  }
+})
+
+app.get('/api/balance', async function (req, response) {
+  try{
+    const balanceResponse = await client.accountsBalanceGet({
+      access_token: ACCESS_TOKEN,
+    });
+    response.json(balanceResponse.data);
+  }catch(error){
+    response.json({ error: error });
+  }
+});
 
 app.get('/api/transactions', async function (req, res) {
   try{  
@@ -121,7 +142,6 @@ app.get('/api/transactions', async function (req, res) {
       //update cursor for next page
       cursor = data.next_cursor;
     }
-    console.log(added, modified, removed, cursor);
     res.json({
       added: added, 
       modified: modified, 
