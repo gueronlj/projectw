@@ -67,7 +67,6 @@ app.post('/api/create_link_token', async function (req, res) {
     const createTokenResponse = await client.linkTokenCreate(request);
     res.json(createTokenResponse.data);
   } catch (error) {
-    console.log(error);
     res.json({ error: error });       
   }
 });
@@ -110,8 +109,7 @@ app.post('/api/accounts', async function (req, res) {
     });
     res.json(accountsResponse.data);
   } catch(error){
-    res.json({ error: error.response?.data?.error_message }); 
-    console.log(error);     
+    res.json({ error: error.response?.data?.error_message });    
   }
 });
 
@@ -137,7 +135,6 @@ app.post('/api/transactions/recurring', async function (req, res) {
     const outgoing = response.data.outflow_streams;
     res.json({ incoming: incoming, outgoing: outgoing });
   }catch(error){
-    console.log(error);
     res.json({ error: error.response?.data?.error_message });
   }
 })
@@ -164,7 +161,6 @@ app.post('/api/investments', async function (req, res) {
     const securities = response.data.securities;
     res.json({holdings: holdings, securities: securities});
   } catch (error) {
-    console.log(error.response.data.error_message);
     res.json({ error: error.response?.data?.error_message });
   }
 })
@@ -222,7 +218,6 @@ app.post('/api/transactions', function (req, response) {
       });
     })
     .catch((error) => {
-      console.log(error.response?.data?.error_message);
       response.json({ error: error.response?.data?.error_message });
     });
 });
