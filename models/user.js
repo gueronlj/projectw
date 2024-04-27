@@ -2,7 +2,6 @@ const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config();
 
 const DB = process.env.DB;
-console.log('module: ', DB);
 const sequelize = new Sequelize(DB);
 
 const user = sequelize.define('User', {

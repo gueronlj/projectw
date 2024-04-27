@@ -84,7 +84,9 @@ app.post('/api/exchange_public_token', async function ( req, res) {
       // These values should be saved to a persistent database and
     // associated with the currently signed-in user
     ACCESS_TOKEN = tokenResponse.data.access_token;
-    ITEM_ID = tokenResponse.data.item_id; 
+    ITEM_ID = tokenResponse.data.item_id;
+
+    //TODO: Chek for exisisting user and existing items, NO DUPLICATE ITEMS (check notes.txt)
     const newUser = {
       user_id: USER_ID,
       access_token: ACCESS_TOKEN,
@@ -92,7 +94,6 @@ app.post('/api/exchange_public_token', async function ( req, res) {
     }
     const userCreatedResapone = await user.create(newUser);
     res.json({
-      // the 'access_token' is a private token, DO NOT pass this token to the frontend in your production environment
       item_id: ITEM_ID,
       error: null,
     });
