@@ -3,7 +3,7 @@ require('dotenv').config();
 const app = express();
 const { PlaidApi, Configuration, PlaidEnvironments } = require('plaid')
 const user = require('./models/user.js')
-const { Sequelize } = require('sequelize')
+const { Sequelize, where } = require('sequelize')
 const cors = require('cors');
 
 const APP_PORT = process.env.APP_PORT || 8000;
@@ -50,11 +50,11 @@ app.listen(3000, () => {
 });
 
 app.post('/api/create_link_token', async function (req, res) {
-  const clientUserId = req.body.user_id;
+  const currentUser = req.body.user_id;
   const request = {
     user: {
     // This should correspond to a unique id for the current user.
-      client_user_id: clientUserId,
+      client_user_id: currentUser,
     },
     client_name: 'Plaid Test App',
     products: ['auth'],
@@ -81,22 +81,30 @@ app.post('/api/exchange_public_token', async function ( req, res) {
     const tokenResponse = await client.itemPublicTokenExchange({
       public_token: PUBLIC_TOKEN,
     });
-      // These values should be saved to a persistent database and
-    // associated with the currently signed-in user
+    // Save tokens to a persistent database and associated with the currently signed-in user
     ACCESS_TOKEN = tokenResponse.data.access_token;
     ITEM_ID = tokenResponse.data.item_id;
-
-    //TODO: Chek for exisisting user and existing items, NO DUPLICATE ITEMS (check notes.txt)
-    const newUser = {
-      user_id: USER_ID,
-      access_token: ACCESS_TOKEN,
-      item_id: ITEM_ID,
+    //Chek for exisisting user and existing items, NO DUPLICATE ITEMS (check notes.txt)
+    const potentialMatch = await user.findOne({where: {user_id: USER_ID}})
+    console.log("found user: " + potentialMatch);
+    if ( potentialMatch === null){
+      //add user to DB
+      const newUser = {
+        user_id: USER_ID,
+        access_token: ACCESS_TOKEN,
+        item_id: ITEM_ID,
+      }
+      await user.create(newUser);
+      res.json({
+        item_id: ITEM_ID,
+        error: null,
+      });
+    } else {
+      res.json({"public_exchange":"complete"})
+      console.log("do something here");
+      
+      //modify existing token in DB maybe?
     }
-    const userCreatedResapone = await user.create(newUser);
-    res.json({
-      item_id: ITEM_ID,
-      error: null,
-    });
   } catch (error) {
     res.json({ error: response?.data?.error_message });
   }
